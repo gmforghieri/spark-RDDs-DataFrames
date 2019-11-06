@@ -19,7 +19,9 @@ object RDDAssignment {
     * @param commits RDD containing commit data.
     * @return Long indicating the number of commits in the given RDD.
     */
-  def assignment_1(commits: RDD[Commit]): Long = ???
+  def assignment_1(commits: RDD[Commit]): Long = {
+    commits.count()
+  }
 
   /**
     * We want to know how often programming languages are used in committed files. We require a RDD containing Tuples
