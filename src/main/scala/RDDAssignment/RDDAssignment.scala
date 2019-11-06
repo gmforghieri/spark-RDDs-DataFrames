@@ -31,7 +31,13 @@ object RDDAssignment {
     * @param commits RDD containing commit data.
     * @return RDD containing tuples indicating the programming language (extension) and number of occurrences.
     */
-  def assignment_2(commits: RDD[Commit]): RDD[(String, Long)] = ???
+  def assignment_2(commits: RDD[Commit]): RDD[(String, Long)] = {
+    commits.flatMap(_.files).map(_.filename).map({
+      case Some(extension) => extension
+      case _ => "unknown"
+    }).map(commit => if (commit.lastIndexOf('.')<0) "unknown" else commit.split('.').reverse(0))
+      .groupBy(identity).mapValues(_.size)
+  }
 
   /**
     * Competitive users on Github might be interested in their ranking in number of commits. We require as return a
