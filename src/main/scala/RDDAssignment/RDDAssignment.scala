@@ -32,7 +32,8 @@ object RDDAssignment {
     * @return RDD containing tuples indicating the programming language (extension) and number of occurrences.
     */
   def assignment_2(commits: RDD[Commit]): RDD[(String, Long)] = {
-    commits.flatMap(_.files).map(_.filename).map({
+    commits
+      .flatMap(_.files).map(_.filename).map({
       case Some(extension) => extension
       case _ => "unknown"
     }).map(commit => if (commit.lastIndexOf('.')<0) "unknown" else commit.split('.').reverse(0))
@@ -50,8 +51,12 @@ object RDDAssignment {
     * @return RDD containing commit author names and total count of commits done by the author, in ordered fashion.
     */
   def assignment_3(commits: RDD[Commit]): RDD[(Long, String, Long)] = {
-    commits.groupBy(_.commit.author.name).mapValues(_.size.toLong).sortBy(tuple => tuple._2, ascending = false)
-      .zipWithIndex().map(tuple => (tuple._2, tuple._1._1, tuple._1._2))
+    commits
+      .groupBy(_.commit.author.name)
+      .mapValues(_.size.toLong)
+      .sortBy(tuple => tuple._2, ascending = false)
+      .zipWithIndex()
+      .map(tuple => (tuple._2, tuple._1._1, tuple._1._2))
   }
 
   /**
@@ -64,8 +69,11 @@ object RDDAssignment {
     * @return RDD containing committer names and an aggregation of the committers Stats.
     */
   def assignment_4(commits: RDD[Commit], users: List[String]): RDD[(String, Stats)] = {
-    commits.map(commit => (commit.commit.committer.name, commit)).map(tuple => (tuple._1, tuple._2.stats.get)).filter(tuple => users.contains(tuple._1)).
-      reduceByKey((accumulatedStats,currentStats) => Stats(accumulatedStats.total + currentStats.total,
+    commits
+      .map(commit => (commit.commit.committer.name, commit))
+      .map(tuple => (tuple._1, tuple._2.stats.get))
+      .filter(tuple => users.contains(tuple._1))
+      .reduceByKey((accumulatedStats,currentStats) => Stats(accumulatedStats.total + currentStats.total,
         accumulatedStats.additions + currentStats.additions, accumulatedStats.deletions + currentStats.deletions))
   }
 
