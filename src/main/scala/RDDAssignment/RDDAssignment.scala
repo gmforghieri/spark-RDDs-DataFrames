@@ -1,7 +1,6 @@
 package RDDAssignment
 
 import java.util.UUID
-
 import java.math.BigInteger
 import java.security.MessageDigest
 
@@ -10,7 +9,9 @@ import org.apache.spark.rdd.RDD
 import utils.{Commit, File, Stats}
 
 object RDDAssignment {
-
+  def getRepoOwner(s: String): String =  {
+    s.split('/')(4)
+  }
 
   /**
     * Reductions are often used in data processing in order to gather more useful data out of raw data. In this case
