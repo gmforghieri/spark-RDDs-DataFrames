@@ -12,6 +12,9 @@ object RDDAssignment {
   def getRepoOwner(s: String): String =  {
     s.split('/')(4)
   }
+  def getRepo(s: String): String =  {
+    s.split('/')(5)
+  }
 
   /**
     * Reductions are often used in data processing in order to gather more useful data out of raw data. In this case
@@ -142,11 +145,11 @@ object RDDAssignment {
   def assignment_8(commits: RDD[Commit]): RDD[(String, Iterable[File])] = {
     val files = commits.filter(commit => getRepo(commit.url) == repository).flatMap(_.files)
     val shas = files.map(x => (x.filename.get, List[String] {x.sha.get})).reduceByKey((a, b) => a ++ b)
-    
+
     val stats = files.map(x => (x.filename.get, Stats(x.additions + x.deletions, x.additions, x.deletions)))
       .reduceByKey((a, b) => Stats(a.total + b.total, a.additions + b.additions, a.deletions + b.deletions))
 
-    shas.join(stats).map(x => (x._1, x._2._1.toSeq, x._2._2))
+    shas.join(stats).map(x => (x._1, x._2._1, x._2._2))
   }
 
 
