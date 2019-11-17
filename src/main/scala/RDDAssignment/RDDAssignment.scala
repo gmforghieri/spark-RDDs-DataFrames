@@ -177,7 +177,11 @@ object RDDAssignment {
     * @return RDD containing tuples of committer names, repository names and and Option[Stat] representing additions and
     *         deletions.
     */
-  def assignment_10(commits: RDD[Commit]): RDD[(String, String, Option[Stats])] = ???
+  def assignment_10(commits: RDD[Commit]): RDD[(String, String, Option[Stats])] = {
+    commits.map(x => ((x.commit.committer.name, x.url.split('/')(5)), x.stats))
+      .reduceByKey((a, b) => Option[Stats](Stats(a.get.total + b.get.total, a.get.additions + b.get.additions, a.get.deletions + b.get.deletions)))
+      .map(x => (x._1._1, x._1._2, x._2))
+  }
 
 
   /**
