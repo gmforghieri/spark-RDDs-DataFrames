@@ -112,7 +112,16 @@ object RDDAssignment {
     * @return RDD of Tuple type containing a commit author username, and a tuple containing the length of the longest
     *         commit streak as well its frequency.
     */
-  def assignment_6(commits: RDD[Commit]): RDD[(String, (Int, Int))] = ???
+  def assignment_6(commits: RDD[Commit]): RDD[(String, (Int, Int))] = {
+    val opt = "([rR])evert(r|R?)[^s]".r
+
+    commits.filter(x => x.commit.message.startsWith("Revert")).map(x => (x.commit.author.name, (opt.findAllIn(x.commit.message).toList.size, 1)))
+      .reduceByKey({
+        case (a, b) if a._1 > b._1 => a
+        case (a, b) if a._1 < b._1 => b
+        case (a, b) if a._1 == b._1 => (a._1, a._2 + b._2)
+      }).filter(x => x._2._1 > 0)
+  }
 
 
   /**
