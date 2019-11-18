@@ -152,8 +152,11 @@ object RDDAssignment {
     * @return RDD containing the files in each repository as described above.
     */
   def assignment_8(commits: RDD[Commit]): RDD[(String, Iterable[File])] = {
-    commits.map(x => (getRepo(x.url), (x.files.filter(f => f.filename.isDefined), x.commit.author.date)))
-      .reduceByKey((a, b) => (a._1.filter(x => !b._1.contains(x) || a._2.after(b._2)).union(b._1), a._2)).map(x => (x._1, x._2._1.toIterable))
+    val lst = commits.map(x => (x.url.split('/')(5), (x.commit.author.date, x.files.filter(f => f.filename.isDefined).map(f => (f.filename.get, f)).toMap)))
+    lst.reduceByKey({
+      case (a, b) if b._1.after(a._1) => (b._1, b._2 ++ (a._2 -- b._2.keySet))
+      case (a, b) => (a._1, a._2 ++ (b._2 -- a._2.keySet))
+    }).map(x => (x._1, x._2._2.values))
   }
 
 
