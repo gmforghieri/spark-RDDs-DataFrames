@@ -2,7 +2,7 @@ package DataFrameAssignment
 
 import java.sql.Timestamp
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{Column, DataFrame, functions}
 
 /**
   * Note read the comments carefully, as they describe the expected result and may contain hints in how
@@ -48,7 +48,12 @@ object DFAssignment {
     * @return Dataframe containing 4 columns, Repository name, week number, year and the number fo commits for that
     *         week.
     */
-  def assignment_2(commits: DataFrame): DataFrame = ???
+  def assignment_2(commits: DataFrame): DataFrame = {
+    val repoName: Column = functions.split(commits("url"), "/").getItem(5).as("repository")
+    val week: Column = functions.weekofyear(commits("commit.author.date")).as("week")
+    val year: Column = functions.year(commits("commit.author.date")).as("year")
+    commits.groupBy(repoName, week, year).agg(functions.count("url").as("count"))
+  }
 
   /**
     * A developer is interested in the age of commits in seconds, although this is something that can always be
