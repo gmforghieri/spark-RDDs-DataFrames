@@ -29,7 +29,10 @@ object DFAssignment {
     *                SHA's.
     * @return DataFrame of commits from the requested authors, including the commit SHA and the according timestamp.
     */
-  def assignment_1(commits: DataFrame, authors: Seq[String]): DataFrame = ???
+  def assignment_1(commits: DataFrame, authors: Seq[String]): DataFrame = {
+    commits.select("commit.committer.name", "sha", "commit.committer.date").filter(commits("commit.committer.name")
+      .isin(authors: _*)).orderBy(commits("commit.committer.date"))
+  }
 
   /**
     * In order to generate weekly dashboards for all projects, we need the data to be partitioned by weeks. As projects
