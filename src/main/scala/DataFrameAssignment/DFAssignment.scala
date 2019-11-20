@@ -73,7 +73,13 @@ object DFAssignment {
     * @param commits Commit Dataframe, created from the data_raw.json file.
     * @return the inputted DataFrame appended with an age column.
     */
-  def assignment_3(commits: DataFrame, snapShotTimestamp: Timestamp): DataFrame = ???
+  def assignment_3(commits: DataFrame, snapShotTimestamp: Timestamp): DataFrame = {
+    val commitTimeStamps: Column = functions.to_timestamp(commits("commit.author.date")).as("start")
+    val snapShotTimeStampCol: Column = functions.to_timestamp(functions.lit(snapShotTimestamp)).as("end")
+    val age: Column = (functions.unix_timestamp(snapShotTimeStampCol) - functions.unix_timestamp(commitTimeStamps)).as("age")
+
+    commits.withColumn("age", age)
+  }
 
   /**
     * To perform analysis on commit behavior the intermediate time of commits is needed. We require that the DataFrame
